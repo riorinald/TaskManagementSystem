@@ -20,7 +20,7 @@ Running with .NET CLI
 Running with Visual Studio
   - open project files
   - restore NuGet Package
-  - Run the application TaskManagementSystem.API
+  - Run the application TaskManagementSystem.API with IIS Express
 
 ## API Endpoints
 GET /api/workitems - List all workitems
