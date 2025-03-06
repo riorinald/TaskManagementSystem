@@ -11,7 +11,7 @@ The project follows a clean architecture approach with the following layers:
 - **Testing Layer**: Contains xUnit Test
 
 
-# Quick Start Guide
+## how to start
 Running with .NET CLI
    dotnet restore
    dotnet build
@@ -22,7 +22,7 @@ Running with Visual Studio
   restore NuGet Package
   Run the application
 
-# API Endpoints
+## API Endpoints
 GET /api/workitems - List all workitems
 GET /api/workitems/{id} - Get task details
 POST /api/workitems - Create a task
