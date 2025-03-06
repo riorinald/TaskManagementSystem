@@ -13,14 +13,14 @@ The project follows a clean architecture approach with the following layers:
 
 ## how to start
 Running with .NET CLI
-   dotnet restore
-   dotnet build
-   dotnet run --project TaskManagementSystem.API
+   - dotnet restore
+   - dotnet build
+   - dotnet run --project TaskManagementSystem.API
 
 Running with Visual Studio
-  open project files
-  restore NuGet Package
-  Run the application
+  - open project files
+  - restore NuGet Package
+  - Run the application TaskManagementSystem.API
 
 ## API Endpoints
 GET /api/workitems - List all workitems
