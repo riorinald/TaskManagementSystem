@@ -29,3 +29,5 @@ POST /api/workitems - Create a task
 PUT /api/workitems/{id} - Update a task
 DELETE /api/workitems/{id} - Delete a task
 GET /api/users - List all users
+
+![Diagram](https://raw.githubusercontent.com/riorinald/TaskManagementSystem/master/diagram.jpg "TEST")
