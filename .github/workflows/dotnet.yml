@@ -1,0 +1,43 @@
+name: PR CI with SonarQube (.NET)
+
+on:
+  pull_request:
+    branches: ["dev"]
+
+jobs:
+  build-and-analyze:
+    name: Build and SonarQube Analysis
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore ./TaskManagementSystem.sln
+
+      - name: Build project
+        run: dotnet build ./TaskManagementSystem.sln --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test ./TaskManagementSystem.sln --no-build --configuration Release
+
+      - name: SonarQube Begin Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+          dotnet sonarscanner begin /k:"YourProjectKey" /d:sonar.host.url="https://sonarqube.example.com" /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+
+      - name: SonarQube Build
+        run: dotnet build ./TaskManagementSystem.sln --no-restore --configuration Release
+
+      - name: SonarQube End Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
