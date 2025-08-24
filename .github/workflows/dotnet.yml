@@ -40,7 +40,9 @@ jobs:
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
         shell: powershell
         run: |
-          New-Item -Path .\.sonar\scanner -ItemType Directory
+          if (-Not (Test-Path ".\.sonar\scanner")) {
+            New-Item -Path .\.sonar\scanner -ItemType Directory
+          }
           dotnet tool install --tool-path .\.sonar\scanner dotnet-sonarscanner
 
       - name: SonarCloud Begin Analysis
