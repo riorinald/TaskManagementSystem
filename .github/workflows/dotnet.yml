@@ -1,4 +1,4 @@
-name: PR CI with SonarQube (.NET)
+name: PR CI with SonarQube cloud (.NET)
 
 on:
   push:
