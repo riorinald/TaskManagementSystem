@@ -2,7 +2,7 @@ name: PR CI with SonarQube cloud (.NET)
 
 on:
   push:
-    branches: ["dev_a"]
+    branches: ["dev_a, master"]
   pull_request:
     branches: ["dev", "master"]
 
