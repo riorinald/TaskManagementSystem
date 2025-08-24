@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-analyze:
-    name: Build and scan with SonarQube Analysis
+    name: Build and SonarCloud Analysis
     runs-on: windows-latest
 
     steps:
@@ -26,33 +26,39 @@ jobs:
       - name: Build project
         run: dotnet build ./TaskManagementSystem.sln --no-restore --configuration Release
 
-      - name: Run tests
-        run: dotnet test ./TaskManagementSystem.sln --no-build --configuration Release
+      - name: Run tests with coverage
+        run: dotnet test ./TaskManagementSystem.sln --no-build --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/Coverage.xml
 
-      - name: Cache SonarQube Cloud packages
-        uses: actions/cache@v4
-        with:
-          path: ~\sonar\cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-      - name: Cache SonarQube Cloud scanner
-        id: cache-sonar-scanner
+      - name: Cache SonarCloud scanner
         uses: actions/cache@v4
         with:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
-      - name: Install SonarQube Cloud scanner
+
+      - name: Install SonarCloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
         shell: powershell
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
-          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-      - name: Build and analyze
+          dotnet tool install --tool-path .\.sonar\scanner dotnet-sonarscanner
+
+      - name: SonarCloud Begin Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"riorinald_TaskManagementSystem" /o:"riorinald" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-          dotnet build
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          .\.sonar\scanner\dotnet-sonarscanner begin `
+            /k:"riorinald_TaskManagementSystem" `
+            /o:"riorinald" `
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
+            /d:sonar.cs.opencover.reportsPaths="**/Coverage.xml"
+
+      - name: Build for Analysis
+        run: dotnet build ./TaskManagementSystem.sln --no-restore --configuration Release
+
+      - name: SonarCloud End Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: powershell
+        run: .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
