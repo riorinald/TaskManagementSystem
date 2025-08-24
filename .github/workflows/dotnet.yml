@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-analyze:
-    name: Build and SonarQube Analysis
+    name: Build and scan with SonarQube Analysis
     runs-on: windows-latest
 
     steps:
