@@ -1,0 +1,52 @@
+name: PR CI with SonarQube Local 94
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["dev"]
+
+jobs:
+  build-and-analyze:
+    name: Build and local sonarQube
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore ./TaskManagementSystem.sln
+
+      - name: Build project
+        run: dotnet build ./TaskManagementSystem.sln --no-restore --configuration Release
+
+      - name: Run tests with coverage
+        run: dotnet test ./TaskManagementSystem.sln --no-build --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=TestResults/Coverage.xml
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+  
+      - name: Download SonarScanner CLI
+        run: |
+          Invoke-WebRequest -Uri https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-windows.zip -OutFile sonar-scanner.zip
+          Expand-Archive sonar-scanner.zip -DestinationPath $env:USERPROFILE\sonar-scanner
+          echo "$env:USERPROFILE\sonar-scanner\sonar-scanner-5.0.1.3006-windows\bin" | Out-File -Append $env:GITHUB_PATH
+  
+      - name: Run SonarQube Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner ^
+            -Dsonar.projectKey=your_project_key ^
+            -Dsonar.sources=. ^
+            -Dsonar.host.url=http://192.168.1.94:9000 ^
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
