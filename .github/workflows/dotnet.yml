@@ -9,7 +9,7 @@ on:
 jobs:
   build-and-analyze:
     name: Build and SonarCloud Analysis
-    runs-on: [self-hosted, windows, dotnet]
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
