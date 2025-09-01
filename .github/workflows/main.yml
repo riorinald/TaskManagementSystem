@@ -2,9 +2,9 @@ name: PR CI with SonarQube Local 94
 
 on:
   push:
-    branches: ["master"]
-  pull_request:
     branches: ["dev"]
+  pull_request:
+    branches: ["dev","master"]
 
 jobs:
   build-and-analyze:
