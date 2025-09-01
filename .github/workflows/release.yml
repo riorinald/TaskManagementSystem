@@ -41,7 +41,7 @@ jobs:
     - name: Determine next tag
       id: tag
       run: |
-        $latestTag = git describe --tags --abbrev=0
+        $latestTag = git tag --sort=-v:refname | Select-Object -First 1
         if (-not $latestTag) { $latestTag = "v0.0.0" }
         $parts = $latestTag.TrimStart("v").Split(".")
         $newTag = "v{0}.{1}.{2}" -f $parts[0], $parts[1], [int]$parts[2] + 1
