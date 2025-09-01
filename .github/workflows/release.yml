@@ -1,5 +1,8 @@
 name: Create Release on Main branch PR Merge
 
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
 on:
   push:
     branches:
