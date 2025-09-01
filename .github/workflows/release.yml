@@ -17,12 +17,17 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
+    - name: Find TaskManagementSystem.API.csproj
+      id: find_project
+      run: |
+        $projectPath = Get-ChildItem -Recurse -Filter TaskManagementSystem.API.csproj | Select-Object -First 1
+        echo "project_path=$($projectPath.FullName)" >> $env:GITHUB_ENV
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore "$env:project_path"
 
     - name: Publish project
-      run: dotnet publish ./TaskManagementSystem/TaskManagementSystem.API/TaskManagementSystem.API.csproj --configuration Release --output ./publish
+      run: dotnet publish "$env:project_path" --configuration Release --output ./publish
 
     - name: Zip published output
       run: Compress-Archive -Path publish\* -DestinationPath release.zip
@@ -61,5 +66,4 @@ jobs:
     - name: Upload zipped artifact
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh release upload $env:new_tag release.zip --clobber
+      run: 
