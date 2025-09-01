@@ -52,13 +52,6 @@ jobs:
         $newTag = "v{0}.{1}.{2}" -f $parts[0], $parts[1], [int]$parts[2] + 1
         echo "new_tag=$newTag" >> $env:GITHUB_ENV
 
-    - name: Create Git tag
-      run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "github-actions@github.com"
-        git tag $env:new_tag
-        git push origin $env:new_tag
-
     - name: Create GitHub Release
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -68,4 +61,5 @@ jobs:
     - name: Upload zipped artifact
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: 
+      run: |
+        gh release upload $env:new_tag release.zip --clobber
