@@ -1,0 +1,70 @@
+name: Create Release on Main branch PR Merge
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x' # Adjust to your target version
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build in Release mode
+      run: dotnet build --configuration Release
+
+    - name: Create release folder
+      run: |
+        mkdir release
+        Copy-Item -Path "bin\Release\net6.0\*" -Destination "release" -Recurse
+
+    - name: Zip release artifacts
+      run: Compress-Archive -Path release\* -DestinationPath release.zip
+
+    - name: Install GitHub CLI
+      run: choco install gh -y
+
+    - name: Authenticate GitHub CLI
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh auth login --with-token < $env:GH_TOKEN
+
+    - name: Determine next tag
+      id: tag
+      run: |
+        $latestTag = git describe --tags --abbrev=0
+        if (-not $latestTag) { $latestTag = "v0.0.0" }
+        $parts = $latestTag.TrimStart("v").Split(".")
+        $newTag = "v{0}.{1}.{2}" -f $parts[0], $parts[1], [int]$parts[2] + 1
+        echo "new_tag=$newTag" >> $env:GITHUB_ENV
+
+    - name: Create Git tag
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+        git tag $env:new_tag
+        git push origin $env:new_tag
+
+    - name: Create GitHub Release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create $env:new_tag --title "$env:new_tag" --notes "Auto release after PR merge to master"
+
+    - name: Upload zipped artifact
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release upload $env:new_tag release.zip --clobber
