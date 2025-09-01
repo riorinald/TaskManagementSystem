@@ -32,3 +32,6 @@ GET /api/users - List all users
 
 ## System Diagram
 ![Diagram](https://raw.githubusercontent.com/riorinald/TaskManagementSystem/master/diagram.jpg "diagram")
+
+## GitHub Action
+Test github action with SonarQube clouds
