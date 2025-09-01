@@ -16,21 +16,16 @@ jobs:
     - name: Set up .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '6.0.x' # Adjust to your target version
+        dotnet-version: '8.0.x'
 
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Build in Release mode
-      run: dotnet build --configuration Release
+    - name: Publish project
+      run: dotnet publish ./TaskManagementSystem/TaskManagementSystem.csproj --configuration Release --output ./publish
 
-    - name: Create release folder
-      run: |
-        mkdir release
-        Copy-Item -Path "bin\Release\net6.0\*" -Destination "release" -Recurse
-
-    - name: Zip release artifacts
-      run: Compress-Archive -Path release\* -DestinationPath release.zip
+    - name: Zip published output
+      run: Compress-Archive -Path publish\* -DestinationPath release.zip
 
     - name: Install GitHub CLI
       run: choco install gh -y
