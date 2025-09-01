@@ -22,7 +22,7 @@ jobs:
       run: dotnet restore
 
     - name: Publish project
-      run: dotnet publish ./TaskManagementSystem/TaskManagementSystem.csproj --configuration Release --output ./publish
+      run: dotnet publish ./TaskManagementSystem/TaskManagementSystem.API/TaskManagementSystem.API.csproj --configuration Release --output ./publish
 
     - name: Zip published output
       run: Compress-Archive -Path publish\* -DestinationPath release.zip
